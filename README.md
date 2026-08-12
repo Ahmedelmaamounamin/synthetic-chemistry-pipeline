@@ -96,7 +96,6 @@ synthetic-chemistry-pipeline/
 │   ├── test_extraction.py
 │   └── test_validation.py
 ├── .env.example                    # Template for environment variables
-├── .gitignore
 ├── requirements.txt
 └── README.md
 
