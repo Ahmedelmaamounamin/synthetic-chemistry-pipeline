@@ -101,4 +101,25 @@ synthetic-chemistry-pipeline/
 └── README.md
 
 ```
+# Installation & Setup
+## Prerequisites
+* Python 3.10+
+* Operating System: Windows 10/11, Linux, or macOS
 
+## 1. Clone the Repository
+```
+git clone [https://github.com/your-username/synthetic-chemistry-pipeline.git](https://github.com/your-username/synthetic-chemistry-pipeline.git)
+cd synthetic-chemistry-pipeline
+```
+## 2. Set Up Virtual Environment
+On Windows (PowerShell):
+```
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+On Linux / macOS:
+```
+python3 -m venv venv
+source venv/bin/activate
+```
