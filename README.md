@@ -123,3 +123,132 @@ On Linux / macOS:
 python3 -m venv venv
 source venv/bin/activate
 ```
+
+## 3. Install Dependencies
+```
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+requirements.txt
+```
+rdkit>=2023.9.1
+pydantic>=2.5.0
+instructor>=1.0.0
+openai>=1.10.0
+pymupdf>=1.23.0
+pdfplumber>=0.10.0
+pint>=0.23
+requests>=2.31.0
+pandas>=2.0.0
+```
+
+# Environment & Configuration
+Create a .env file in the project root directory (or edit src/config.py):
+```
+# Copy example template
+cp .env.example .env
+```
+
+Set your OpenRouter API key:
+```
+OPENROUTER_API_KEY=sk-or-v1-YOUR_ACTUAL_API_KEY
+```
+To set the environment variable in Windows PowerShell for the current session:
+```
+$env:OPENROUTER_API_KEY="sk-or-v1-YOUR_ACTUAL_API_KEY"
+```
+
+Model Selection (src/config.py)
+You can switch models freely in src/config.py:
+```
+# Recommended Free OpenRouter Models:
+# - "meta-llama/llama-3.3-70b-instruct:free" (High performance, excellent schema compliance)
+# - "google/gemini-2.0-flash-lite-001:free" (Fast, high context window)
+# - "openrouter/auto"                        (Automatic routing)
+extraction_model: str = "meta-llama/llama-3.3-70b-instruct:free"
+```
+
+# Usage
+## 1. Place Source PDFs
+Place your target literature PDFs inside the materials input directory:
+
+materials_dir in src/config.py
+
+## 2. Run the Processing Pipeline
+```
+python -m src.pipeline
+```
+## 3. Pipeline Output
+* SQLite Database: Saved at output/reactions.db with structured relational tables for reactions and materials.
+* JSON Schema Outputs: Audit-ready nested JSON files stored with full metadata and quality flags.
+
+# Quality Control (QC) Scoring Matrix
+
+Every record is evaluated deterministically using four weighted metrics (0.0–10.0 scale):
+
+QC Score = 0.25(Provenance) + 0.35(Chemical Validity) + 0.25(Stoichiometry) + 0.15(Text Match)
+
+
+| Metric | Weight | Evaluation Criteria |
+|---|---:|---|
+| **Provenance Completeness** | 25% | Checks if extracted entities have non-empty verbatim source text quotes attached. |
+| **Chemical Validity** | 35% | Verifies presence of reactant/substrate and product, valid SMILES parsing, and IUPAC name resolution ratio. |
+| **Stoichiometric Consistency** | 25% | Checks for physical consistency across reported Mass, Molecular Weight, and Moles (Mass ≈ MW × Moles). |
+| **Text Support Verification** | 15% | Ensures verbatim quotes actually exist within the source PDF text block. |
+
+Data Schema Example
+
+```
+{
+  "reaction_id": "RXN-C3A9B1D2",
+  "document_id": "journal_chem_2024_001",
+  "procedure_text": "To a solution of compound 1 (500 mg, 2.1 mmol) in THF (10 mL)...",
+  "materials": [
+    {
+      "raw_name": "compound 1",
+      "role": "substrate",
+      "is_limiting": true,
+      "canonical_smiles": null,
+      "mass": {
+        "raw_text": "500 mg",
+        "normalized": { "value": 500.0, "unit": "mg", "si_value": 0.5, "si_unit": "g" }
+      },
+      "moles": {
+        "raw_text": "2.1 mmol",
+        "normalized": { "value": 2.1, "unit": "mmol", "si_value": 0.0021, "si_unit": "mol" }
+      },
+      "provenance": {
+        "document_id": "journal_chem_2024_001",
+        "page_number": 3,
+        "exact_quote": "compound 1 (500 mg, 2.1 mmol)"
+      }
+    }
+  ],
+  "conditions": {
+    "temperature_raw": "80 °C",
+    "temperature_min_c": 80.0,
+    "time_raw": "4 h",
+    "time_hours": 4.0,
+    "atmosphere": "Nitrogen"
+  },
+  "yield_info": {
+    "raw_text": "81% yield",
+    "value_percent": 81.0,
+    "yield_type": "isolated"
+  },
+  "quality": {
+    "provenance_completeness": 10.0,
+    "chemical_validity": 8.5,
+    "stoichiometric_consistency": 10.0,
+    "overall_score": 9.2,
+    "validation_flags": [],
+    "requires_human_review": false
+  }
+}
+```
+
+Development & Testing
+Run unit tests to verify RDKit structure validation, unit normalization, and quality scoring engines:
+```
+pytest tests/
+```
