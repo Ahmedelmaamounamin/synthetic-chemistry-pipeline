@@ -196,7 +196,7 @@ QC Score = 0.25(Provenance) + 0.35(Chemical Validity) + 0.25(Stoichiometry) + 0.
 | **Stoichiometric Consistency** | 25% | Checks for physical consistency across reported Mass, Molecular Weight, and Moles (Mass ≈ MW × Moles). |
 | **Text Support Verification** | 15% | Ensures verbatim quotes actually exist within the source PDF text block. |
 
-Data Schema Example
+## Data Schema Example
 
 ```
 {
@@ -247,8 +247,8 @@ Data Schema Example
 }
 ```
 
-Development & Testing
-Run unit tests to verify RDKit structure validation, unit normalization, and quality scoring engines:
+## Development & Testing
+### Run unit tests to verify RDKit structure validation, unit normalization, and quality scoring engines:
 ```
 pytest tests/
 ```
