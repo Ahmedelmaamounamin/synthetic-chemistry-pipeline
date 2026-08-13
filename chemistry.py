@@ -1,5 +1,5 @@
 import urllib.parse
-from typing import Optional, Dict, Tuple
+from typing import Any, Dict, Optional, Tuple
 import requests
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
